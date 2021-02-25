@@ -1,9 +1,21 @@
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultHighlighter;
+import javax.swing.text.Highlighter;
+import javax.swing.text.Highlighter.HighlightPainter;
 
 public class GUI 
 {
@@ -16,6 +28,75 @@ public class GUI
 		this.base = base;
 	}
 	
+	
+	private static void highlightTextAreas(JTextArea ta1, JTextArea ta2) throws BadLocationException
+	{
+		Highlighter highlighter1 = ta1.getHighlighter();
+		Highlighter highlighter2 = ta2.getHighlighter();
+	    HighlightPainter green = new DefaultHighlighter.DefaultHighlightPainter(Color.green);
+	    HighlightPainter red = new DefaultHighlighter.DefaultHighlightPainter(Color.red);
+	    
+    	String text1 = ta1.getText();
+	    String text2 = ta2.getText();
+		
+		if(text1.length() > text2.length())
+		{
+			for(int i = 0 ; i < text2.length(); i++)
+			{
+				if(text1.charAt(i) == text2.charAt(i))
+				{
+					highlighter1.addHighlight(i, i + 1, green);
+					highlighter2.addHighlight(i, i + 1, green);
+				}
+				else
+				{
+					highlighter1.addHighlight(i, i + 1, red);
+					highlighter2.addHighlight(i, i + 1, red);
+				}
+			}
+			
+			for(int i = text2.length(); i < text1.length(); i++)
+				highlighter1.addHighlight(i, i + 1, red);
+		}
+		
+		else if(text2.length() > text1.length())
+		{
+			for(int i = 0 ; i < text1.length(); i++)
+			{
+				if(text2.charAt(i) == text1.charAt(i))
+				{
+					highlighter1.addHighlight(i, i + 1, green);
+					highlighter2.addHighlight(i, i + 1, green);
+				}
+				else
+				{
+					highlighter1.addHighlight(i, i + 1, red);
+					highlighter2.addHighlight(i, i + 1, red);
+				}
+			}
+			
+			for(int i = text1.length(); i < text2.length(); i++)
+				highlighter2.addHighlight(i, i + 1, red);
+		}
+		
+		else
+		{
+			for(int i = 0 ; i < text1.length(); i++)
+			{
+				if(text1.charAt(i) == text2.charAt(i))
+				{
+					highlighter1.addHighlight(i, i + 1, green);
+					highlighter2.addHighlight(i, i + 1, green);
+				}
+				else
+				{
+					highlighter1.addHighlight(i, i + 1, red);
+					highlighter2.addHighlight(i, i + 1, red);
+				}
+			}
+		}
+	}
+	
 	private static void compareTextAreas() 
 	{
 	    try
@@ -23,10 +104,20 @@ public class GUI
 	    	base.setText1(ta1.getText());
 		    base.setText2(ta2.getText());
 		    
-		    if(base.compareStrings(base.text1, base.text2))
-		    	JOptionPane.showMessageDialog(null, "The text strings are identical.", "Compare Result", JOptionPane.INFORMATION_MESSAGE);
-		    else
-		    	JOptionPane.showMessageDialog(null, "The text strings are different.", "Compare Result", JOptionPane.INFORMATION_MESSAGE);
+		    ta1.getHighlighter().removeAllHighlights();
+		    ta2.getHighlighter().removeAllHighlights();
+		    
+		    if(ta1.getText().length() != 0 && ta2.getText().length() != 0)
+		    {
+		    	if(base.compareStrings(base.text1, base.text2))
+			    	JOptionPane.showMessageDialog(null, "The text strings are identical.", "Compare result", JOptionPane.INFORMATION_MESSAGE);
+			    else
+			    {
+			    	JOptionPane.showMessageDialog(null, "The text strings are different.", "Compare result", JOptionPane.INFORMATION_MESSAGE);
+			    	highlightTextAreas(ta1, ta2);
+			    }
+		    }
+		    else JOptionPane.showMessageDialog(null, "Please add something in both text boxes.", "Warning! Add text.", JOptionPane.WARNING_MESSAGE);
 	    }
 	    catch(Throwable exception)
 	    {
@@ -41,7 +132,10 @@ public class GUI
 			ta1.setText(null);
 			ta2.setText(null);
 			
-			JOptionPane.showMessageDialog(null, "The text boxes have been cleared...", "Text Cleared", JOptionPane.INFORMATION_MESSAGE);
+			ta1.getHighlighter().removeAllHighlights();
+		    ta2.getHighlighter().removeAllHighlights();
+			
+			JOptionPane.showMessageDialog(null, "The text boxes have been cleared...", "Text cleared", JOptionPane.INFORMATION_MESSAGE);
 		}
 		catch (Throwable exception) 
 		{
